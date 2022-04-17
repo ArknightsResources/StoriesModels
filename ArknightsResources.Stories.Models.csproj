@@ -6,10 +6,11 @@
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Baka632</Authors>
+	<Copyright>Copyright (c) 2022 Baka632</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <PackageTags>Arknights</PackageTags>
+    <PackageTags>Arknights;明日方舟</PackageTags>
     <RepositoryUrl>https://dev.azure.com/LiveBakaStudio/ArknightsResources/_git/ArknightsResources?path=/ArknightsResources.Stories.Models</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Baka632/ArknightsResources</PackageProjectUrl>
 	<IncludeSymbols>true</IncludeSymbols>
@@ -17,6 +18,7 @@
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	<PackageIcon>icon.png</PackageIcon>
+	<Description>Provides models about Arknights stories</Description>
   </PropertyGroup>
 
   <ItemGroup>
