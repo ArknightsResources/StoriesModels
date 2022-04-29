@@ -336,9 +336,9 @@ namespace ArknightsResources.Stories.Models
                     int focus = matchFocus.Success ? int.Parse(matchFocus.Groups[1].Value) : 1;
                     double fadeTime = matchFadeTime.Success ? GetDoubleFromMatch(matchFadeTime) : 0.15d;
                     CharacterIllustrationEnterStyle enterStyle = matchEnterStyle.Success ? (CharacterIllustrationEnterStyle)Enum.Parse(
-                        typeof(CharacterIllustrationEnterStyle), matchEnterStyle.Groups[1].Value) : CharacterIllustrationEnterStyle.None;
+                        typeof(CharacterIllustrationEnterStyle), matchEnterStyle.Groups[1].Value, true) : CharacterIllustrationEnterStyle.None;
                     CharacterIllustrationEnterStyle enterStyle2 = matchEnterStyle2.Success ? (CharacterIllustrationEnterStyle)Enum.Parse(
-                        typeof(CharacterIllustrationEnterStyle), matchEnterStyle2.Groups[1].Value) : CharacterIllustrationEnterStyle.None;
+                        typeof(CharacterIllustrationEnterStyle), matchEnterStyle2.Groups[1].Value, true) : CharacterIllustrationEnterStyle.None;
 
                     if (string.IsNullOrEmpty(codeName2))
                     {
