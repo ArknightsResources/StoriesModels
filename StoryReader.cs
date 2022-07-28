@@ -295,7 +295,7 @@ namespace ArknightsResources.Stories.Models
                     DelayCommand delayCommandWithArg = new DelayCommand(delay);
                     return delayCommandWithArg;
                 }
-                else if (GetMatchByPattern(strToAnalyse, "Delay").Success)
+                else if (GetMatchByPattern(strToAnalyse, "\\[Delay").Success)
                 {
                     DelayCommand delayCommand = new DelayCommand(0d);
                     return delayCommand;
