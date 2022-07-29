@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -677,6 +678,7 @@ namespace ArknightsResources.Stories.Models
         /// <param name="strToAnalyse">要分析的字符串</param>
         /// <param name="pattern">正则表达式字符串</param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Match GetMatchByPattern(string strToAnalyse, string pattern)
         {
             return Regex.Match(strToAnalyse, pattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
