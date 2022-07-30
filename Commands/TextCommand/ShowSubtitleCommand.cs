@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ArknightsResources.Stories.Models.Commands
+﻿namespace ArknightsResources.Stories.Models.Commands
 {
-    public class ShowSubtitleCommand : StoryCommand
+    /// <summary>
+    /// 表示一个显示剧情文本(字幕式)的命令
+    /// </summary>
+    public class ShowSubtitleCommand : TextCommand
     {
         //TODO:add comment
-        public ShowSubtitleCommand(string text, double x, double y, string alignment, double size, double delay, double width) : base(false)
+        public ShowSubtitleCommand(string text, double x, double y, string alignment, double size, double delay, double width) : base(text)
         {
-            Text = text;
             X = x;
             Y = y;
             Alignment = alignment;
@@ -17,8 +15,6 @@ namespace ArknightsResources.Stories.Models.Commands
             Delay = delay;
             Width = width;
         }
-
-        public string Text { get; }
 
         public double X { get; }
 

@@ -3,7 +3,7 @@
 namespace ArknightsResources.Stories.Models.Commands
 {
     /// <summary>
-    /// 表示剧情文件中一行命令的基类
+    /// 表示剧情文件的一行命令
     /// </summary>
     [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public abstract class StoryCommand

@@ -145,6 +145,7 @@ namespace ArknightsResources.Stories.Models
 
                                         if (result.Count == 0)
                                         {
+                                            //这种情况相当于Decision不对下面的剧情文本产生影响,因此这里全部填充为无操作
                                             foreach (var item in options)
                                             {
                                                 result[item] = new StoryCommand[] { new NoOperationCommand() };
