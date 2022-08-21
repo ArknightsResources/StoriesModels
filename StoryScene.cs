@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ArknightsResources.Stories.Models
 {
@@ -76,8 +77,7 @@ namespace ArknightsResources.Stories.Models
         private static void GetTextInternal(IEnumerable<StoryCommand> cmds, StringBuilder builder, bool cmdInDecision = false)
         {
             IEnumerable<StoryCommand> textCommands = from textCmd in cmds
-                                                     where textCmd is ShowPlainTextCommand
-                                                            || textCmd is ShowTextWithNameCommand
+                                                     where textCmd is TextCommand
                                                             || textCmd is DecisionCommand
                                                      select textCmd;
 
@@ -90,11 +90,23 @@ namespace ArknightsResources.Stories.Models
 
                 switch (item)
                 {
-                    case ShowPlainTextCommand plainTextCmd:
-                        _ = builder.AppendLine(plainTextCmd.Text);
-                        break;
                     case ShowTextWithNameCommand textWithNameCmd:
-                        _ = builder.AppendLine($"{textWithNameCmd.Name}:{textWithNameCmd.Text}");
+                        _ = builder.AppendLine($"{textWithNameCmd.Name}: {textWithNameCmd.Text}");
+                        break;
+                    case ShowStickerCommand showStickerCmd:
+                        var matchPlainText = Regex.Match(showStickerCmd.Text, @"<[\s\S]*>([\s\S]*)<\/[\s\S]*>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                        if (matchPlainText.Success)
+                        {
+                            var stickerPlainText = matchPlainText.Groups[1].Value;
+                            _ = builder.AppendLine(stickerPlainText);
+                        }
+                        else
+                        {
+                            _ = builder.AppendLine(showStickerCmd.Text);
+                        }
+                        break;
+                    case TextCommand textCommand:
+                        _ = builder.AppendLine(textCommand.Text);
                         break;
                     case DecisionCommand decisionCmd:
                         builder.AppendLine();

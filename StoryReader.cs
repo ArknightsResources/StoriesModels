@@ -652,10 +652,6 @@ namespace ArknightsResources.Stories.Models
                         return new ShowPlainTextCommand(text);
                     }
                 }
-                else
-                {
-                    return new NoOperationCommand();
-                }
             }
             #endregion
             #region MatchVideo
@@ -670,7 +666,46 @@ namespace ArknightsResources.Stories.Models
                 }
             }
             #endregion
-            throw new ArgumentException($@"无法分析参数""{nameof(strToAnalyse)}"",原始文件行:第{textLine}行,原始文本:""{strToAnalyse}""");
+            #region MatchSticker
+            {
+                var matchSticker = GetMatchByPattern(strToAnalyse, @"\[Sticker\(([\s\S]*)\)\]");
+                if (matchSticker.Success)
+                {
+                    string stickerArgs = matchSticker.Groups[1].Value;
+                    var matchText = GetMatchByPattern(stickerArgs, @"text=""([\s\S]*?)""");
+                    var matchId = GetMatchByPattern(stickerArgs, @"id=""([\s\S]*?)""");
+                    var matchX = GetMatchByPattern(stickerArgs, $"x={MatchDecimalString}");
+                    var matchY = GetMatchByPattern(stickerArgs, $"y={MatchDecimalString}");
+                    var matchAlignment = GetMatchByPattern(stickerArgs, @"alignment=""([\s\S]*?)""");
+                    var matchSize = GetMatchByPattern(stickerArgs, $"size={MatchDecimalString}");
+                    var matchDelay = GetMatchByPattern(stickerArgs, $"delay={MatchDecimalString}");
+                    var matchWidth = GetMatchByPattern(stickerArgs, $"width={MatchDecimalString}");
+
+                    string text = matchText.Groups[1].Value;
+                    string id = matchId.Groups[1].Value;
+                    double x = matchX.Success ? GetDoubleFromMatch(matchX) : 0;
+                    double y = matchY.Success ? GetDoubleFromMatch(matchY) : 0;
+                    double size = matchSize.Success ? GetDoubleFromMatch(matchSize) : 18;
+                    double delay = matchDelay.Success ? GetDoubleFromMatch(matchDelay) : 0;
+                    double width = matchWidth.Success ? GetDoubleFromMatch(matchWidth) : 675;
+                    string alignment = matchAlignment.Success ? matchAlignment.Groups[1].Value : string.Empty;
+                    ShowStickerCommand stickerCommand = new ShowStickerCommand(id, x, y, alignment, size, delay, width, text);
+                    return stickerCommand;
+                }
+            }
+            #endregion
+            #region MatchHideSticker
+            {
+                var matchHideSticker = GetMatchByPattern(strToAnalyse, @"\[stickerclear\]");
+                if (matchHideSticker.Success)
+                {
+                    HideStickerCommand hideStickerCommand = new HideStickerCommand();
+                    return hideStickerCommand;
+                }
+            }
+            #endregion
+            return new NoOperationCommand();
+            //throw new ArgumentException($@"无法分析参数""{nameof(strToAnalyse)}"",原始文件行:第{textLine}行,原始文本:""{strToAnalyse}""");
         }
 
         /// <summary>

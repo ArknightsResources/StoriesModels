@@ -1,7 +1,7 @@
 ﻿namespace ArknightsResources.Stories.Models.Commands
 {
     /// <summary>
-    /// 无操作命令
+    /// 指示无操作的命令,该类一般只在代码内使用
     /// </summary>
     public class NoOperationCommand : StoryCommand
     {
