@@ -19,6 +19,7 @@
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
 	<PackageIcon>icon.png</PackageIcon>
 	<Description>Provides models about Arknights stories</Description>
+	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
