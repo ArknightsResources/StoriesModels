@@ -16,9 +16,9 @@ namespace ArknightsResources.Stories.Models
     /// </summary>
     public sealed class StoryReader
     {
+        //private int textLine = 0;
         private readonly StringReader stringReader;
         private readonly bool convertPopupDialog;
-        private int textLine = 0;
         private const string MatchDecimalString = @"([1-9]\d*\.?\d*|0\d*\.?\d*|\d)";
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace ArknightsResources.Stories.Models
         private string ReadText()
         {
             string strToAnalyse = stringReader.ReadLine();
-            textLine++;
+            //textLine++;
             return strToAnalyse;
         }
 

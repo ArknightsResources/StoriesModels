@@ -6,20 +6,28 @@
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Baka632</Authors>
-	<Copyright>Copyright (c) 2022 Baka632</Copyright>
+    <Copyright>Copyright (c) 2022 Baka632</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <PackageTags>Arknights;明日方舟</PackageTags>
     <RepositoryUrl>https://dev.azure.com/LiveBakaStudio/ArknightsResources/_git/ArknightsResources?path=/ArknightsResources.Stories.Models</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Baka632/ArknightsResources</PackageProjectUrl>
-	<IncludeSymbols>true</IncludeSymbols>
-	<PublishRepositoryUrl>true</PublishRepositoryUrl>
-	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-	<EmbedUntrackedSources>true</EmbedUntrackedSources>
-	<PackageIcon>icon.png</PackageIcon>
-	<Description>Provides models about Arknights stories</Description>
-	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <IncludeSymbols>False</IncludeSymbols>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageIcon>icon.png</PackageIcon>
+    <Description>Provides models about Arknights stories</Description>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
