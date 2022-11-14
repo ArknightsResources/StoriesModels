@@ -76,10 +76,13 @@ namespace ArknightsResources.Stories.Models
 
         private static void GetTextInternal(IEnumerable<StoryCommand> cmds, StringBuilder builder, bool cmdInDecision = false)
         {
-            IEnumerable<StoryCommand> textCommands = from textCmd in cmds
-                                                     where textCmd is TextCommand
-                                                            || textCmd is DecisionCommand
-                                                     select textCmd;
+            //转换为List<T>的原因是:接下来的某些操作需要获取之后的项目,而IEnumerable不能进行这些操作
+            List<StoryCommand> commands = cmds.ToList();
+
+            List<StoryCommand> textCommands = (from textCmd
+                                               in commands
+                                               where textCmd is TextCommand || textCmd is DecisionCommand
+                                               select textCmd).ToList();
 
             foreach (var item in textCommands)
             {
@@ -109,16 +112,44 @@ namespace ArknightsResources.Stories.Models
                         _ = builder.AppendLine(textCommand.Text);
                         break;
                     case DecisionCommand decisionCmd:
+                        //添加空行来分隔选择文本与其他对话
                         builder.AppendLine();
                         foreach (var option in decisionCmd.AvailableOptions)
                         {
                             builder.AppendLine($"[{option}]");
                             GetTextInternal(decisionCmd[option], builder, true);
                         }
+
+                        int indexInTextCmds = textCommands.IndexOf(item);
+                        //如果下一条命令是DecisionCommand,则结束switch语句,避免写入多余的空行
+                        if (indexInTextCmds != -1 && textCommands.ElementAtOrDefault(indexInTextCmds + 1) is DecisionCommand)
+                        {
+                            break;
+                        }
                         builder.AppendLine();
                         break;
                     default:
                         break;
+                }
+
+                int index = commands.IndexOf(item);
+                if (index != -1)
+                {
+                    //从完整的StoryCommand列表中选取从当前TextCommand到下一个TextCommand中的命令
+                    IEnumerable<StoryCommand> cmdSegment = commands.Skip(index + 1)
+                                                                   .TakeWhile((cmd) => !(cmd is TextCommand));
+
+                    //如果当前命令是DecisionCommand,则不会进行下面的操作,因为我们在前面已经添加了空行
+                    //接下来,如果cmdSegment中有DecisionCommand,操作同上
+                    //最后,如果cmdSegment中有HideDialogCommand及ShowBackgroundCommand,才添加空行
+                    if (!(item is DecisionCommand)
+                        && !cmdSegment.Any((cmd) => cmd is DecisionCommand)
+                        && cmdSegment.Any((cmd) => cmd is HideDialogCommand)
+                        && cmdSegment.Any((cmd) => cmd is ShowBackgroundCommand
+                                                   || cmd is ShowCharacterIllustrationCommand))
+                    {
+                        builder.AppendLine();
+                    }
                 }
             }
         }
