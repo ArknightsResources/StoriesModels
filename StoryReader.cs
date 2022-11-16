@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -404,7 +405,7 @@ namespace ArknightsResources.Stories.Models
                     double g = matchG.Success ? GetDoubleFromMatch(matchG) : 0;
                     double b = matchB.Success ? GetDoubleFromMatch(matchB) : 0;
                     double fadeTime = matchFadeTime.Success ? GetDoubleFromMatch(matchFadeTime) : 0.2;
-                    bool isBlock = GetBooleanFromMatch(matchBlock);
+                    bool isBlock = matchBlock.Success ? GetBooleanFromMatch(matchBlock) : false;
                     ShowBlockerCommand blockerCommand = new ShowBlockerCommand(a, r, g, b, fadeTime, isBlock);
                     return blockerCommand;
                 }
@@ -701,6 +702,23 @@ namespace ArknightsResources.Stories.Models
                 {
                     HideStickerCommand hideStickerCommand = new HideStickerCommand();
                     return hideStickerCommand;
+                }
+            }
+            #endregion
+            #region MatchMultiline
+            {
+                var matchName = GetMatchByPattern(strToAnalyse, @"\[multiline\(name=""([\s\S]*)""");
+                var matchText = GetMatchByPattern(strToAnalyse, @"\]\s*([\s\S]*)");
+                var matchDelay = GetMatchByPattern(strToAnalyse, $"delay={MatchDecimalString}");
+                var matchEnd = GetMatchByPattern(strToAnalyse, $"end=(true|false)");
+                if (matchName.Success)
+                {
+                    string name = matchName.Groups[1].Value;
+                    string text = matchText.Groups[1].Value;
+                    bool isEnd = matchEnd.Success ? GetBooleanFromMatch(matchEnd) : false;
+                    double delay = matchDelay.Success ? GetDoubleFromMatch(matchDelay) : 0d;
+                    ShowMultilineCommand showMultiline = new ShowMultilineCommand(name, text, delay, isEnd);
+                    return showMultiline;
                 }
             }
             #endregion

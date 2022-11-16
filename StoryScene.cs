@@ -66,15 +66,16 @@ namespace ArknightsResources.Stories.Models
         /// <summary>
         /// 获取剧情文件的纯文本形式
         /// </summary>
+        /// <param name="tryParagraph">指示是否让StoryScene尝试自动断行的值</param>
         /// <returns>剧情文件的纯文本</returns>
-        public string GetStoryText()
+        public string GetStoryText(bool tryParagraph)
         {
             StringBuilder builder = new StringBuilder(StoryCommands.Length);
-            GetTextInternal(StoryCommands, builder);
+            GetTextInternal(StoryCommands, builder, false, tryParagraph);
             return builder.ToString();
         }
 
-        private static void GetTextInternal(IEnumerable<StoryCommand> cmds, StringBuilder builder, bool cmdInDecision = false)
+        private static void GetTextInternal(IEnumerable<StoryCommand> cmds, StringBuilder builder, bool cmdInDecision, bool tryParagraph)
         {
             //转换为List<T>的原因是:接下来的某些操作需要获取之后的项目,而IEnumerable不能进行这些操作
             List<StoryCommand> commands = cmds.ToList();
@@ -84,8 +85,9 @@ namespace ArknightsResources.Stories.Models
                                                where textCmd is TextCommand || textCmd is DecisionCommand
                                                select textCmd).ToList();
 
-            foreach (var item in textCommands)
+            for (int i = 0; i < textCommands.Count; i++)
             {
+                StoryCommand item = textCommands[i];
                 if (cmdInDecision)
                 {
                     _ = builder.Append('\t');
@@ -108,6 +110,66 @@ namespace ArknightsResources.Stories.Models
                             _ = builder.AppendLine(showStickerCmd.Text);
                         }
                         break;
+                    case ShowMultilineCommand showMultilineCmd:
+                        _ = builder.Append($"{showMultilineCmd.Name}: {showMultilineCmd.Text}");
+
+                        {
+                            //加大括号防止smcNext变量外溢
+                            if (textCommands.ElementAtOrDefault(i + 1) is ShowMultilineCommand smcNext && smcNext.IsEnd)
+                            {
+                                //如果下一个ShowMultilineCommand为结束命令,那么处理完这两个命令就完事了
+                                //i++是为了让for不获取已经处理过的ShowMultilineCommand命令
+                                i++;
+                                _ = builder.AppendLine(smcNext.Text);
+                                break;
+                            }
+                        }
+
+                        ShowMultilineCommand smcLast = null;
+                        IEnumerable<ShowMultilineCommand> cmdSegment = from cmd
+                                         in textCommands.Skip(i + 1)
+                                                        .TakeWhile((cmd) =>
+                                                        {
+                                                            if (!(cmd is ShowMultilineCommand smc))
+                                                            {
+                                                                //如果cmd不是ShowMultilineCommand命令,则返回true,继续Take操作
+                                                                return true;
+                                                            }
+                                                            else
+                                                            {
+                                                                //如果cmd是ShowMultilineCommand命令,那么我们需要进行特殊的处理
+                                                                bool isEnd = smc.IsEnd;
+                                                                if (isEnd)
+                                                                {
+                                                                    //当smc.IsEnd为true时,我们应当返回false来结束TakeWhile操作
+                                                                    //但是这样会丢失最后一个ShowMultilineCommand命令
+                                                                    //所以我们需要记录它,避免丢失数据
+                                                                    smcLast = smc;
+                                                                }
+
+                                                                //避免for获取已经处理过的ShowMultilineCommand命令
+                                                                i++;
+                                                                //如果ShowMultilineCommand命令为结束命令...
+                                                                //则返回false来结束TakeWhile操作
+                                                                //如果不为结束命令,则返回true继续
+                                                                return !isEnd;
+                                                            }
+                                                        })
+                                         where cmd is ShowMultilineCommand
+                                                                       select (cmd as ShowMultilineCommand);
+                        foreach (ShowMultilineCommand smc in cmdSegment)
+                        {
+                            _ = builder.Append(smc.Text);
+                        }
+
+                        if (smcLast != null)
+                        {
+                            //把cmdSegment中缺失的最后一个命令补上
+                            _ = builder.Append(smcLast.Text);
+                        }
+
+                        _ = builder.AppendLine();
+                        break;
                     case TextCommand textCommand:
                         _ = builder.AppendLine(textCommand.Text);
                         break;
@@ -117,12 +179,11 @@ namespace ArknightsResources.Stories.Models
                         foreach (var option in decisionCmd.AvailableOptions)
                         {
                             builder.AppendLine($"[{option}]");
-                            GetTextInternal(decisionCmd[option], builder, true);
+                            GetTextInternal(decisionCmd[option], builder, true, tryParagraph);
                         }
 
-                        int indexInTextCmds = textCommands.IndexOf(item);
                         //如果下一条命令是DecisionCommand,则结束switch语句,避免写入多余的空行
-                        if (indexInTextCmds != -1 && textCommands.ElementAtOrDefault(indexInTextCmds + 1) is DecisionCommand)
+                        if (textCommands.ElementAtOrDefault(i + 1) is DecisionCommand)
                         {
                             break;
                         }
@@ -132,23 +193,26 @@ namespace ArknightsResources.Stories.Models
                         break;
                 }
 
-                int index = commands.IndexOf(item);
-                if (index != -1)
+                if (tryParagraph)
                 {
-                    //从完整的StoryCommand列表中选取从当前TextCommand到下一个TextCommand中的命令
-                    IEnumerable<StoryCommand> cmdSegment = commands.Skip(index + 1)
-                                                                   .TakeWhile((cmd) => !(cmd is TextCommand));
-
-                    //如果当前命令是DecisionCommand,则不会进行下面的操作,因为我们在前面已经添加了空行
-                    //接下来,如果cmdSegment中有DecisionCommand,操作同上
-                    //最后,如果cmdSegment中有HideDialogCommand及ShowBackgroundCommand,才添加空行
-                    if (!(item is DecisionCommand)
-                        && !cmdSegment.Any((cmd) => cmd is DecisionCommand)
-                        && cmdSegment.Any((cmd) => cmd is HideDialogCommand)
-                        && cmdSegment.Any((cmd) => cmd is ShowBackgroundCommand
-                                                   || cmd is ShowCharacterIllustrationCommand))
+                    int totalCmdsIndex = commands.IndexOf(item);
+                    if (totalCmdsIndex != -1)
                     {
-                        builder.AppendLine();
+                        //从完整的StoryCommand列表中选取从当前TextCommand到下一个TextCommand中的命令
+                        IEnumerable<StoryCommand> cmdSegment = commands.Skip(totalCmdsIndex + 1)
+                                                                       .TakeWhile((cmd) => !(cmd is TextCommand));
+
+                        //如果当前命令是DecisionCommand,则不会进行下面的操作,因为我们在前面已经添加了空行
+                        //接下来,如果cmdSegment中有DecisionCommand,操作同上
+                        //最后,如果cmdSegment中有HideDialogCommand及ShowBackgroundCommand,才添加空行
+                        if (!(item is DecisionCommand)
+                            && !cmdSegment.Any((cmd) => cmd is DecisionCommand)
+                            && cmdSegment.Any((cmd) => cmd is HideDialogCommand)
+                            && cmdSegment.Any((cmd) => cmd is ShowBackgroundCommand
+                                                       || cmd is ShowCharacterIllustrationCommand))
+                        {
+                            builder.AppendLine();
+                        }
                     }
                 }
             }
