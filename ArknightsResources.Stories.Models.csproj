@@ -11,8 +11,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <PackageTags>Arknights;明日方舟</PackageTags>
-    <RepositoryUrl>https://dev.azure.com/LiveBakaStudio/ArknightsResources/_git/ArknightsResources?path=/ArknightsResources.Stories.Models</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/Baka632/ArknightsResources</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ArknightsResources/Home</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <PackageIcon>icon.png</PackageIcon>
@@ -20,7 +19,7 @@
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
       <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
@@ -32,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="1.1.1">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
