@@ -1,1 +1,1 @@
-# ArknightsResources.Stories.Models
+# ArknightsResources - Stories Models
