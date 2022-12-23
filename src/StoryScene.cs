@@ -128,25 +128,14 @@ namespace ArknightsResources.Stories.Models
                         }
 
                         ShowMultilineCommand smcLast = null;
-                        int handledCommands = 0;
                         IEnumerable<ShowMultilineCommand> cmdSegment = from cmd
                                          in textCommands.Skip(i + 1)
                                                         .TakeWhile((cmd) =>
                                                         {
-                                                            handledCommands++;
                                                             if (!(cmd is ShowMultilineCommand smc))
                                                             {
-                                                                if (handledCommands > 15)
-                                                                {
-                                                                    //处理的非Multiline命令超过了15个,这是不正常的
-                                                                    //Multiline命令应当是比较连续的
-                                                                    //我们很有可能已经离开了Multiline命令的作用范围
-                                                                    //所以我们应当停止Take操作
-                                                                    return false;
-                                                                }
-
-                                                                //如果cmd不是ShowMultilineCommand命令,则返回true,继续Take操作
-                                                                return true;
+                                                                //如果cmd不是ShowMultilineCommand命令,则返回false,结束Take操作
+                                                                return false;
                                                             }
                                                             else
                                                             {
